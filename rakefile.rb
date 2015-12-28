@@ -70,8 +70,19 @@ namespace :package do
     create_package(TARGET_WIN32, :windows)
   end
 
+  desc 'Get git clone of app'
+  task :fetch_source do
+    if File.exist? 'packaging/app'
+      sh 'git --git-dir=packaging/app/.git pull'
+    else
+      sh 'git clone https://github.com/averissimo/mass-blast.git' \
+        ' packaging/app'
+    end
+    sh 'cp packaging/app/Gemfile .'
+  end
+
   desc 'Install gems to local directory'
-  task :bundle_install do
+  task bundle_install: [:fetch_source] do
     sh 'rm -rf packaging/tmp'
     sh 'mkdir packaging/tmp'
     sh 'cp Gemfile Gemfile.lock packaging/tmp/'
@@ -130,11 +141,8 @@ end
 def create_package(target, os_type = :unix)
   package_dir = "#{PACKAGE_NAME}-#{VERSION}-#{target}"
   sh "rm -rf #{package_dir}"
-  sh "mkdir #{package_dir}"
   sh "mkdir -p #{package_dir}/lib/app"
-  sh 'git clone https://github.com/averissimo/mass-blast.git' \
-    " #{package_dir}/lib/app"
-  sh "rm -rf #{package_dir}/lib/app/.git"
+  sh "cp -r packaging/app #{package_dir}/lib"
   sh "rm -rf #{package_dir}/lib/app/vendor/ruby"
   sh "mkdir #{package_dir}/lib/ruby"
   sh 'tar -xzf' \
@@ -159,6 +167,7 @@ def create_package(target, os_type = :unix)
     sh "zip -9r #{package_dir}.zip #{package_dir}"
   end
   sh "rm -rf #{package_dir}"
+  sh "rm Gemfile"
 end
 
 def download_runtime(target)
