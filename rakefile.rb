@@ -78,6 +78,10 @@ namespace :package do
       sh 'git clone https://github.com/averissimo/mass-blast.git' \
         ' packaging/app'
     end
+    cur_path = FileUtils.pwd
+    FileUtils.cd 'packaging/app/', verbose: true
+    sh 'rake bootstrap'
+    FileUtils.cd cur_path
     sh 'cp packaging/app/Gemfile .'
   end
 
