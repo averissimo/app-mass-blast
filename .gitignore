@@ -3,3 +3,5 @@ Gemfile.lock
 packaging/vendor
 packaging/bachberry
 packaging/app
+packaging/traveling*.gz
+Gemfile
