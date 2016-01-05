@@ -26,24 +26,30 @@ task bachberry: ['bachberry:linux:x86',
 namespace :bachberry do
   namespace :linux do
     desc 'Package BacHBerry files in app for Linux x86 '
-    task x86: [:'package:linux:x86'] do
+    task x86: [:dir_only, :'package:linux:x86'] do
       bachberry_files(TARGET_LINUX_X86)
     end
 
     desc 'Package BacHBerry files in app for Linux x86 '
-    task x86_64: [:'package:linux:x86_64'] do
+    task x86_64: [:dir_only, :'package:linux:x86_64'] do
       bachberry_files(TARGET_LINUX_X86_64)
     end
   end
 
   desc 'Package BacHBerry files in app for OS X'
-  task osx: [:'package:osx'] do
+  task osx: [:dir_only, :'package:osx'] do
     bachberry_files(TARGET_OSX)
   end
 
   desc 'Package BacHBerry files in app for Win x86'
-  task win32: [:'package:win32'] do
-    bachberry_files(TARGET_WIN32)
+  task win32: [:dir_only, :'package:win32'] do
+    bachberry_files(TARGET_WIN32, :win32)
+  end
+
+  desc 'Set environment variable DIR_ONLY to 1'
+  task :dir_only do
+    ENV['OLD_DIR_ONLY'] = ENV['DIR_ONLY']
+    ENV['DIR_ONLY'] = 1.to_s
   end
 end
 
@@ -114,10 +120,11 @@ file "packaging/traveling-ruby-#{TRAVELING_RUBY_VERSION}-win32.tar.gz" do
   download_runtime(TARGET_WIN32)
 end
 
-def bachberry_files(target)
+def bachberry_files(target, os_type = :unix)
   package_dir = "#{PACKAGE_NAME}-#{VERSION}-#{target}"
   sh "cp -r packaging/bachberry/db      #{package_dir}/db_and_queries"
   sh "cp -r packaging/bachberry/queries #{package_dir}/db_and_queries"
+  package(package_dir, os_type) unless ENV['OLD_DIR_ONLY']
 end
 
 def app_config(package_dir)
@@ -163,15 +170,17 @@ def create_package(target, os_type = :unix)
   sh "cp packaging/bundler-config #{package_dir}/lib/vendor/.bundle/config"
   #
   app_config(package_dir)
+  package(package_dir, os_type) unless ENV['DIR_ONLY']
   #
-  return false if ENV['DIR_ONLY']
+end
+
+def package(package_dir, os_type)
   if os_type == :unix
     sh "tar -czf #{package_dir}.tar.gz #{package_dir}"
   else
     sh "zip -9r #{package_dir}.zip #{package_dir}"
   end
   sh "rm -rf #{package_dir}"
-  sh "rm Gemfile"
 end
 
 def download_runtime(target)
