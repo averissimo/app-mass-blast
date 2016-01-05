@@ -84,21 +84,20 @@ namespace :package do
       sh 'git clone https://github.com/averissimo/mass-blast.git' \
         ' packaging/app'
     end
-    cur_path = FileUtils.pwd
-    FileUtils.cd 'packaging/app/', verbose: true
-    sh 'rake bootstrap'
-    FileUtils.cd cur_path
-    sh 'cp packaging/app/Gemfile .'
   end
 
   desc 'Install gems to local directory'
   task bundle_install: [:fetch_source] do
     sh 'rm -rf packaging/tmp'
     sh 'mkdir packaging/tmp'
-    sh 'cp Gemfile Gemfile.lock packaging/tmp/'
+    sh 'cp packaging/app/Gemfile packaging/tmp/'
     Bundler.with_clean_env do
       sh 'cd packaging/tmp && env BUNDLE_IGNORE_CONFIG=1 bundle install --path ../vendor --without development'
+      sh 'cp packaging/tmp/Gemfile packaging/tmp/Gemfile.lock packaging/vendor'
+      sh "mkdir -p packaging/vendor/.bundle"
+      sh "cp packaging/bundler-config packaging/vendor/.bundle/config"
     end
+    sh 'rm -rf vendor'
     sh 'rm -rf packaging/tmp'
     sh 'rm -f packaging/vendor/*/*/cache/*'
   end
@@ -140,7 +139,7 @@ def app_config(package_dir)
   sh "mkdir #{package_dir}/db_and_queries/queries"
   sh "mkdir #{package_dir}/output" # create directory for output
   sh "cp -r #{package_dir}/lib/app/db_and_queries/import_dbs #{package_dir}/db_and_queries"
-  sh "cp #{package_dir}/lib/app/db_and_queries/db/taxdb* #{package_dir}/db_and_queries/db"
+  sh "cp -r #{package_dir}/lib/app/db_and_queries/db #{package_dir}/db_and_queries"
   data = YAML.load_file config_file
   data['output'] = { 'dir' => '../../output' }
   data['db']['parent'] = '../../db_and_queries/db'
@@ -165,10 +164,15 @@ def create_package(target, os_type = :unix)
     sh "cp packaging/wrapper.bat #{package_dir}/mass-blast.bat"
   end
   sh "cp -pR packaging/vendor #{package_dir}/lib/"
-  sh "cp Gemfile Gemfile.lock #{package_dir}/lib/vendor/"
-  sh "mkdir #{package_dir}/lib/vendor/.bundle"
-  sh "cp packaging/bundler-config #{package_dir}/lib/vendor/.bundle/config"
   #
+  # retrieve external data
+  #
+#  cur_path = FileUtils.pwd
+#  FileUtils.cd 'packaging/app/', verbose: true
+#  sh 'env BUNDLE_GEMFILE="../vendor/Gemfile" rake bootstrap'
+#  FileUtils.cd cur_path
+  #
+  ##
   app_config(package_dir)
   package(package_dir, os_type) unless ENV['DIR_ONLY']
   #
