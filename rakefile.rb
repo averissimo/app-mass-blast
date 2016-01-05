@@ -1,5 +1,6 @@
 # For Bundler.with_clean_env
 require 'bundler/setup'
+require 'bundler'
 require 'yaml'
 
 PACKAGE_NAME = 'mass-blast'
