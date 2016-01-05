@@ -92,7 +92,8 @@ namespace :package do
     sh 'mkdir packaging/tmp'
     sh 'cp packaging/app/Gemfile packaging/tmp/'
     Bundler.with_clean_env do
-      sh 'cd packaging/tmp && env BUNDLE_IGNORE_CONFIG=1 bundle install --path ../vendor --without development'
+      sh 'cd packaging/tmp && env BUNDLE_IGNORE_CONFIG=1' \
+        ' bundle install --path ../vendor --without development'
       sh 'cp packaging/tmp/Gemfile packaging/tmp/Gemfile.lock packaging/vendor'
       sh "mkdir -p packaging/vendor/.bundle"
       sh "cp packaging/bundler-config packaging/vendor/.bundle/config"
