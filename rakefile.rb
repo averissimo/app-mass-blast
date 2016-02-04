@@ -12,7 +12,7 @@ TARGET_LINUX_X86_64 = 'linux-x86_64'
 TARGET_OSX          = 'osx'
 TARGET_WIN32        = 'win32'
 
-COMMIT="0da246126a476bcf58d9c63258d3d1bfea30d8c3"
+COMMIT=( ENV["COMMIT"].nil? ? "master" : ENV["COMMIT"] )
 
 desc 'Package your app'
 task package: ['package:linux:x86',
@@ -82,7 +82,7 @@ namespace :package do
   desc 'Get git clone of app'
   task :fetch_source do
     if File.exist? 'packaging/app'
-      sh 'git --git-dir=packaging/app/.git --work-tree=packaging/app pull'
+      sh 'git -C packaging/app pull'
     else
       sh 'git clone https://github.com/averissimo/mass-blast.git' \
         ' packaging/app'
