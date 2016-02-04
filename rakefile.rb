@@ -82,12 +82,12 @@ namespace :package do
   desc 'Get git clone of app'
   task :fetch_source do
     if File.exist? 'packaging/app'
-      sh 'git -C packaging/app pull'
+      sh 'git -C packaging/app fetch --all'
     else
       sh 'git clone https://github.com/averissimo/mass-blast.git' \
         ' packaging/app'
     end
-      sh "git --git-dir=packaging/app/.git checkout #{COMMIT}"
+      sh "git -C packaging/app checkout #{COMMIT}"
   end
 
   desc 'Install gems to local directory'
