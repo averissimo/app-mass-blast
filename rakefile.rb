@@ -5,7 +5,11 @@ require 'yaml'
 
 PACKAGE_NAME = 'mass-blast'
 
-VERSION = if File.exist?('VERSION') && YAML.load_file('VERSION')
+VERSIONS_PATH = 'versions.yml'
+
+VERSION = if (test_version = (File.exist?('VERSION') &&
+                              YAML.load_file('VERSION')))
+            #
             YAML.load_file('VERSION')['version']
           else
             'please-create-VERSION-file'
@@ -18,8 +22,12 @@ TARGET_LINUX_X86_64 = 'linux-x86_64'
 TARGET_OSX          = 'osx'
 TARGET_WIN32        = 'win32'
 
-COMMIT = (ENV['COMMIT'].nil? ? 'master' : ENV['COMMIT'])
-VERSIONS_PATH = 'versions.yml'
+COMMIT = if test_version && test_version['commit']
+           test_version['commit']
+         else
+           'master'
+         end
+#
 
 desc 'Package your app'
 task package: ['package:linux:x86',
