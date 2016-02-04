@@ -25,7 +25,7 @@ TARGET_WIN32        = 'win32'
 COMMIT = if test_version && test_version['commit']
            test_version['commit']
          else
-           'master'
+           'origin/master'
          end
 #
 
