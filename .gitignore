@@ -6,3 +6,4 @@ packaging/app
 packaging/traveling*.gz
 Gemfile
 mass-blast*
+versions.yml

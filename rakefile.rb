@@ -4,7 +4,13 @@ require 'bundler'
 require 'yaml'
 
 PACKAGE_NAME = 'mass-blast'
-VERSION = '1.0.0'
+
+VERSION = if File.exist?('VERSION') && YAML.load_file('VERSION')
+            YAML.load_file('VERSION')['version']
+          else
+            'please-create-VERSION-file'
+          end
+
 TRAVELING_RUBY_VERSION = '20150715-2.2.2'
 
 TARGET_LINUX_X86    = 'linux-x86'
@@ -12,7 +18,8 @@ TARGET_LINUX_X86_64 = 'linux-x86_64'
 TARGET_OSX          = 'osx'
 TARGET_WIN32        = 'win32'
 
-COMMIT=( ENV["COMMIT"].nil? ? "master" : ENV["COMMIT"] )
+COMMIT = (ENV['COMMIT'].nil? ? 'master' : ENV['COMMIT'])
+VERSIONS_PATH = 'versions.yml'
 
 desc 'Package your app'
 task package: ['package:linux:x86',
@@ -182,6 +189,17 @@ def create_package(target, os_type = :unix)
   ##
   app_config(package_dir)
   package(package_dir, os_type) unless ENV['DIR_ONLY']
+  # save version number
+  versions = if File.exist? VERSIONS_PATH
+               YAML.load_file(VERSIONS_PATH)
+             else
+               {}
+             end
+  versions[VERSION] ||= {}
+  versions[VERSION][DateTime.now.to_s] = `git -C packaging/app rev-parse HEAD`
+  File.open(VERSIONS_PATH, 'wb') do |f|
+    f.write(YAML.dump(versions))
+  end
   #
 end
 
