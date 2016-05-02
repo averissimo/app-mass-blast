@@ -163,12 +163,8 @@ def app_config(package_dir)
   sh "cp -r #{package_dir}/lib/app/db_and_queries/import_dbs #{package_dir}/db_and_queries"
   sh "cp -r #{package_dir}/lib/app/db_and_queries/db #{package_dir}/db_and_queries"
   data = YAML.load_file config_file
-  data['output'] = { 'dir' => '../../output' }
-  data['db']['parent'] = '../../db_and_queries/db'
-  data['query']['parent'] = '../../db_and_queries'
   data['debug'] = {} if data['debug'].nil?
-  data['debug']['file'] = '../../log.txt'
-  data['annotation_dir'] = '../../db_and_queries/annotation'
+  data['debug']['file'] = 'log.txt'
   File.open(config_file, 'w') { |f| YAML.dump(data, f) }
   #
 end
