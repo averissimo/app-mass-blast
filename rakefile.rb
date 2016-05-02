@@ -168,6 +168,7 @@ def app_config(package_dir)
   data['query']['parent'] = '../../db_and_queries'
   data['debug'] = {} if data['debug'].nil?
   data['debug']['file'] = '../../log.txt'
+  data['annotation_dir'] = '../../db_and_queries/annotation'
   File.open(config_file, 'w') { |f| YAML.dump(data, f) }
   #
 end
