@@ -152,8 +152,8 @@ def app_config(package_dir)
   config_file = "#{package_dir}/user.yml"
   # cp user.yml from source
   #  and create an example file that has all the comments
-  sh "cp #{package_dir}/lib/app/config/user.yml #{config_file}"
-  sh "cp #{package_dir}/lib/app/config/user.yml #{config_file}.example"
+  sh "cp #{package_dir}/lib/app/user.yml #{config_file}"
+  sh "cp #{package_dir}/lib/app/user.yml #{config_file}.example"
   # cp file structure to base dir to help users
   sh "mkdir #{package_dir}/db_and_queries"
   sh "mkdir #{package_dir}/db_and_queries/db"
