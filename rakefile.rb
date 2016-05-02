@@ -143,6 +143,7 @@ def bachberry_files(target, os_type = :unix)
   package_dir = "#{PACKAGE_NAME}-#{VERSION}-#{target}"
   sh "cp -r packaging/bachberry/db      #{package_dir}/db_and_queries"
   sh "cp -r packaging/bachberry/queries #{package_dir}/db_and_queries"
+  sh "cp -r packaging/bachberry/annotation #{package_dir}/db_and_queries"
   package(package_dir, os_type) unless ENV['OLD_DIR_ONLY']
 end
 
@@ -157,6 +158,7 @@ def app_config(package_dir)
   sh "mkdir #{package_dir}/db_and_queries"
   sh "mkdir #{package_dir}/db_and_queries/db"
   sh "mkdir #{package_dir}/db_and_queries/queries"
+  sh "mkdir #{package_dir}/db_and_queries/annotation"
   sh "mkdir #{package_dir}/output" # create directory for output
   sh "cp -r #{package_dir}/lib/app/db_and_queries/import_dbs #{package_dir}/db_and_queries"
   sh "cp -r #{package_dir}/lib/app/db_and_queries/db #{package_dir}/db_and_queries"
