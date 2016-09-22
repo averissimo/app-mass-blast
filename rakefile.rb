@@ -148,6 +148,7 @@ def create_package(target, os_type = :unix)
     sh "cp packaging/testing.sh #{package_dir}/testing"
   else
     sh "cp packaging/wrapper.bat #{package_dir}/mass-blast.bat"
+    sh "cp packaging/testing.bat #{package_dir}/testing.bat"
   end
   sh "cp -pR packaging/vendor #{package_dir}/lib/"
   #
