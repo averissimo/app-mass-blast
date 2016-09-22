@@ -8,3 +8,4 @@ set BUNDLE_IGNORE_CONFIG=
 cd %~dp0\lib\app
 @"%~dp0\lib\ruby\bin\ruby.bat" -rbundler/setup "%~dp0\lib\app\script.rb" "%~dp0\user.yml"
 cd %~dp0
+pause
