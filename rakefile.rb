@@ -41,36 +41,6 @@ task bachberry: ['bachberry:linux:x86',
                  'bachberry:osx',
                  'bachberry:win32']
 
-namespace :bachberry do
-  namespace :linux do
-    desc 'Package BacHBerry files in app for Linux x86 '
-    task x86: [:dir_only, :'package:linux:x86'] do
-      bachberry_files(TARGET_LINUX_X86)
-    end
-
-    desc 'Package BacHBerry files in app for Linux x86 '
-    task x86_64: [:dir_only, :'package:linux:x86_64'] do
-      bachberry_files(TARGET_LINUX_X86_64)
-    end
-  end
-
-  desc 'Package BacHBerry files in app for OS X'
-  task osx: [:dir_only, :'package:osx'] do
-    bachberry_files(TARGET_OSX)
-  end
-
-  desc 'Package BacHBerry files in app for Win x86'
-  task win32: [:dir_only, :'package:win32'] do
-    bachberry_files(TARGET_WIN32, :win32)
-  end
-
-  desc 'Set environment variable DIR_ONLY to 1'
-  task :dir_only do
-    ENV['OLD_DIR_ONLY'] = ENV['DIR_ONLY']
-    ENV['DIR_ONLY'] = 1.to_s
-  end
-end
-
 namespace :package do
   namespace :linux do
     desc 'Package your app for Linux x86'
@@ -98,11 +68,13 @@ namespace :package do
   task :fetch_source do
     if File.exist? 'packaging/app'
       sh 'git -C packaging/app fetch --all'
+      sh 'git -C packaging/app fetch --tags'
     else
       sh 'git clone https://github.com/averissimo/mass-blast.git' \
         ' packaging/app'
     end
-      sh "git -C packaging/app checkout #{COMMIT}"
+    sh "git -C packaging/app checkout origin/master"
+    sh "git -C packaging/app checkout #{COMMIT}"
   end
 
   desc 'Install gems to local directory'
@@ -139,14 +111,6 @@ file "packaging/traveling-ruby-#{TRAVELING_RUBY_VERSION}-win32.tar.gz" do
   download_runtime(TARGET_WIN32)
 end
 
-def bachberry_files(target, os_type = :unix)
-  package_dir = "#{PACKAGE_NAME}-#{VERSION}-#{target}"
-  sh "cp -r packaging/bachberry/db      #{package_dir}/db_and_queries"
-  sh "cp -r packaging/bachberry/queries #{package_dir}/db_and_queries"
-  sh "cp -r packaging/bachberry/annotation #{package_dir}/db_and_queries"
-  package(package_dir, os_type) unless ENV['OLD_DIR_ONLY']
-end
-
 def app_config(package_dir)
   # name of config file
   config_file = "#{package_dir}/user.yml"
@@ -181,6 +145,7 @@ def create_package(target, os_type = :unix)
     " -C #{package_dir}/lib/ruby"
   if os_type == :unix
     sh "cp packaging/wrapper.sh #{package_dir}/mass-blast"
+    sh "cp packaging/testing.sh #{package_dir}/testing"
   else
     sh "cp packaging/wrapper.bat #{package_dir}/mass-blast.bat"
   end
